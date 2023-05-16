@@ -5,7 +5,6 @@ int main()
 {
       char msg[30],key[30],k[20],ct[20],pt[20];
       int lenm,lenk,i,j;
-      clrscr();
  
       printf("Enter Message : ");
       gets(msg);
