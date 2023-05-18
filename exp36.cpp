@@ -1,32 +1,70 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
 
-void caesar_cipher(char *str, int key) {
-    int len = strlen(str);
-    for (int i = 0; i < len; i++) {
-        if (isalpha(str[i])) {
-            if (isupper(str[i])) {
-                str[i] = ((str[i] - 'A') + key) % 26 + 'A';
-            } else {
-                str[i] = ((str[i] - 'a') + key) % 26 + 'a';
-            }
+int gcd(int a, int b) {
+    if (a == 0) {
+        return b;
+    } else {
+        return gcd(b % a, a);
+    }
+}
+
+int find_inverse(int a) {
+    int i;
+    for (i = 0; i < 26; i++) {
+        if ((a * i) % 26 == 1) {
+            return i;
         }
+    }
+    return -1;
+}
+
+int encrypt(int a, int b, char p) {
+    if (isalpha(p)) {
+        int c = toupper(p) - 'A';
+        return (a * c + b) % 26;
+    } else {
+        return p;
+    }
+}
+
+int decrypt(int a, int b, char c) {
+    if (isalpha(c)) {
+        int inv_a = find_inverse(a);
+        int p = (inv_a * ((c - 'A' - b + 26) % 26)) % 26;
+        return p;
+    } else {
+        return c;
     }
 }
 
 int main() {
-    char message[1000];
-    int key;
+    int a, b;
+    char plaintext[100], ciphertext[100], decrypted[100];
+    printf("Enter value of a: ");
+    scanf("%d", &a);
+    if (gcd(a, 26) != 1) {
+        printf("Invalid value of a. Choose a value that is coprime with 26.\n");
+        exit(1);
+    }
+    printf("Enter value of b: ");
+    scanf("%d", &b);
+    printf("Enter plaintext: ");
+    scanf(" %[^\n]", plaintext);
 
-    printf("Enter message to encrypt: ");
-    fgets(message, sizeof(message), stdin);
+    int i;
+    for (i = 0; plaintext[i] != '\0'; i++) {
+        ciphertext[i] = encrypt(a, b, plaintext[i]);
+    }
+    ciphertext[i] = '\0';
+    printf("Ciphertext: %s\n", ciphertext);
 
-    printf("Enter key (1-25): ");
-    scanf("%d", &key);
-
-    caesar_cipher(message, key);
-    printf("Encrypted message: %s", message);
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        decrypted[i] = decrypt(a, b, ciphertext[i]);
+    }
+    decrypted[i] = '\0';
+    printf("Decrypted text: %s\n", decrypted);
 
     return 0;
 }
